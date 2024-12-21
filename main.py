@@ -1,47 +1,28 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify
 from processing import process_trade_date, process_date_range
 
 app = Flask(__name__)
 
-@app.route('/process-date', methods=['POST'])
-def process_single_date():
-    """Process data for a specific date."""
-    data = request.json
-    trade_date = data.get("trade_date")
-    if not trade_date:
-        return jsonify({"error": "trade_date is required"}), 400
+@app.route('/process', methods=['GET'])
+def process_data():
+    start_date_input = request.args.get('start_date')
+    end_date_input = request.args.get('end_date')
 
-    try:
-        output_file = process_trade_date(trade_date)
-        return jsonify({"message": "Data processed successfully", "file": output_file}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    if start_date_input and end_date_input:
+        try:
+            start_date = datetime.strptime(start_date_input, '%d-%m-%Y')
+            end_date = datetime.strptime(end_date_input, '%d-%m-%Y')
 
+            if start_date > end_date:
+                return jsonify({"error": "Start date cannot be after the end date."}), 400
 
-@app.route('/process-range', methods=['POST'])
-def process_range():
-    """Process data for a range of dates."""
-    data = request.json
-    start_date = data.get("start_date")
-    end_date = data.get("end_date")
-    if not start_date or not end_date:
-        return jsonify({"error": "start_date and end_date are required"}), 400
+            process_date_range(start_date, end_date)
+            return jsonify({"message": "Data processed successfully."})
 
-    try:
-        process_date_range(start_date, end_date)
-        return jsonify({"message": "Date range processed successfully"}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route('/download/<filename>', methods=['GET'])
-def download_file(filename):
-    """Download processed data file."""
-    try:
-        return send_file(f"data/{filename}", as_attachment=True)
-    except FileNotFoundError:
-        return jsonify({"error": "File not found"}), 404
-
+        except ValueError:
+            return jsonify({"error": "Invalid date format. Please use DD-MM-YYYY."}), 400
+    else:
+        return jsonify({"error": "Start and End date are required."}), 400
 
 if __name__ == '__main__':
     app.run(debug=True)
