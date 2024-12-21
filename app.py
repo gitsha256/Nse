@@ -28,5 +28,4 @@ def process_data():
         return jsonify({"error": "Start and End date are required."}), 400
 
 if __name__ == "__main__":
-    # Specify the port that Render or other cloud services require (usually 10000 or something similar)
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
