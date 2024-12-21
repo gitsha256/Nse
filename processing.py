@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from nselib import derivatives, capital_market
 from datetime import datetime, timedelta
@@ -5,7 +6,7 @@ from datetime import datetime, timedelta
 # Function to process data for a given date
 def process_trade_date(trade_date):
     try:
-        print(f"\nProcessing data for {trade_date}...")
+        print(f"\nProcessing data for {trade_date}...")  
 
         # Fetch the F&O bhav copy data
         fno_data = derivatives.fno_bhav_copy(trade_date=trade_date)
@@ -83,7 +84,6 @@ def process_trade_date(trade_date):
             'Low Price': 'min',
             'Total Value': 'sum',
             'Lot Size': 'first',
-            
         }
 
         # Aggregate data to remove duplicate symbols
@@ -107,19 +107,22 @@ def process_date_range(start_date, end_date):
         current_date += timedelta(days=1)
 
 
-# Input for the date range
-start_date_input = input("Enter the start date (DD-MM-YYYY): ").strip()
-end_date_input = input("Enter the end date (DD-MM-YYYY): ").strip()
+# Get the start and end date from environment variables
+start_date_input = os.environ.get('START_DATE', '').strip()
+end_date_input = os.environ.get('END_DATE', '').strip()
 
 # Convert input dates to datetime objects
 try:
-    start_date = datetime.strptime(start_date_input, '%d-%m-%Y')
-    end_date = datetime.strptime(end_date_input, '%d-%m-%Y')
-    
-    if start_date > end_date:
-        print("Start date cannot be after the end date.")
+    if start_date_input and end_date_input:
+        start_date = datetime.strptime(start_date_input, '%d-%m-%Y')
+        end_date = datetime.strptime(end_date_input, '%d-%m-%Y')
+
+        if start_date > end_date:
+            print("Start date cannot be after the end date.")
+        else:
+            process_date_range(start_date, end_date)
     else:
-        process_date_range(start_date, end_date)
+        print("Start and End date must be provided as environment variables.")
 
 except ValueError:
     print("Invalid date format. Please use DD-MM-YYYY.")
