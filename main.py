@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from processing import process_trade_date, process_date_range
+from datetime import datetime  # Import datetime
 import os
 
 app = Flask(__name__)
@@ -17,6 +18,7 @@ def process_data():
             if start_date > end_date:
                 return jsonify({"error": "Start date cannot be after the end date."}), 400
 
+            # Call the process_date_range function to process the data
             process_date_range(start_date, end_date)
             return jsonify({"message": "Data processed successfully."})
 
