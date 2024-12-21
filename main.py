@@ -27,4 +27,4 @@ def process_data():
 
 if __name__ == "__main__":
     # Specify the port that Render or other cloud services require (usually 10000 or something similar)
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
