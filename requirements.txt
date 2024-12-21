@@ -1,6 +1,7 @@
 numpy==1.24.0  # or the latest compatible version
 pandas==1.5.3  # or the latest compatible version
-flask==2.1.1
+Flask==2.1.1       # or the latest stable version of Flask
+Werkzeug==2.1.0    # or a compatible version of Werkzeug (>=2.0)
 fastapi==0.95.0
 uvicorn==0.18.3
 nselib==1.5
